@@ -109,7 +109,8 @@ Goto prometheus server and edit the prometheus config file with node exporer ip 
 vi /opt/prometheus/prometheus.yml
 ```
 ```
- static_configs:
+  - job_name: "prometheus"
+    static_configs:
       - targets: ["localhost:9090"]
         labels:
           name: "prometheus"
@@ -176,9 +177,70 @@ Create dashboard:
 grafana home -> dashboard -> create dash board -> add visualisation -> select prometheus -> code -> (enter the queries in matrics browser field like up etc) -> run queries -> save dashboard
 then it displays the queries in visual form. On the right side we choose visualisation form like timeseries graph, bar chart etc
 
+In the scrape config filed, we added node exporter with IP and port, so that node exporter send data to prometheus. But in case of k8s cluster, worker node IPs changes frequently , so can't add IPs in scrape config field. This can be solved using tags, called dynamic scrapping
 
+dynamic scrapping:
+1. our target ec2's should have node exporter installed.
+2. prometheus server should have permission to describe ec2 instances. (whatevr the tags/availability zone filters we added in scrape config field, prometheus server should have permission to desrcribe that). In IAM policies, we have DescribeInstances policy.
+3. we should filter the target instances based on the tags, region, az etc.
+4. 
+ec2_sd_config
+https://aws.amazon.com/blogs/mt/automating-amazon-ec2-instance-monitoring-with-prometheus-ec2-service-discovery-and-aws-distro-for-opentelemetry/
+```
+# ADOT Collector configuration to scrape targets from specific Availability Zone "ap-south-1a"
+---
+ec2_sd_configs:
+  - region: ap-south-1
+    port: 9100
+    filters:
+      - name: __meta_ec2_availability_zone
+        values:
+          - ap-south-1a
+relabel_configs:
+  - source_labels:
+      - __meta_ec2_instance_id
+    target_label: instance_id
+```
+https://prometheus.io/docs/prometheus/latest/configuration/configuration/#ec2_sd_config
 
+Alert management:
 
+Alert rules:
+https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
 
+Once we get the alerts, what we have to do ? Its done with alert manager. 
+Aletr manager will take care of what to do after getting the alert.
+
+https://github.com/prometheus/alertmanager/releases/download/v0.28.1/alertmanager-0.28.1.linux-amd64.tar.gz
+https://prometheus.io/download/
+
+```
+cd /opt
+wget https://github.com/prometheus/alertmanager/releases/download/v0.28.1/alertmanager-0.28.1.linux-amd64.tar.gz
+tar -xvf alertmanager-0.28.1.linux-amd64.tar.gz
+mv alertmanager-0.28.1.linux-amd64 alertmanager
+```
+Then configure alert manager service in /etc/systemd. There is no configuration file in node exporter
+```
+vim /etc/systemd/system/alertmanager.service
+```
+```
+[Unit]
+Description=Alert manager
+
+[Service]
+ExecStart=/opt/alertmanager/alertmanager --config.file=/opt/alertmanager/alertmanager.yml
+
+[Install]
+WantedBy=multi-user.target
+```
+```
+systemctl start alertmanager
+netstat -lntp
+systemctl enable alertmanager
+```
+alert managers opened 2 ports 9093, 9094. we can use 9093 port in prometheus.yaml config file.
+
+open alert manager console with http://<public-ip>:9093
 
 
