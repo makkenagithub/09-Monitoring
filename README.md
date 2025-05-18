@@ -18,7 +18,7 @@ Prometheus:
 
 ![image](https://github.com/user-attachments/assets/8d344492-fff2-4f24-a443-8f51e1934a22)
 
-http server is prometheus server using which we open console. service discovery is scrape config component. So service discovery discovers whatt all nodes are under monitoring of prometheus. TSD is time-series DB.
+http server is prometheus server using which we open console. service discovery is scrape config component. So service discovery discovers whatt all nodes are under monitoring of prometheus. TSD is time-series DB. Grafana is for visualisation purpose.
 
 We need to install the agent software "node exporter" in the instances(ec2) which needs to be monitored. Node exporter passes the information to prometheus server continuously. All that information will be stored in a database names TDS (time-series data base) in prometheus server
 
@@ -124,7 +124,59 @@ vi /opt/prometheus/prometheus.yml
 systemctl restart prometheus
 systemctl status prometheus
 ```
-In prometheus console, give up and see, node exporter also added there
+In prometheus console, give up and see, node exporter also added there. Also we can see lot of metrics exists for monitoring here.
+
+Visualisation in prometheus is not good. Fot visuvalisation we use Grafana. So we install grafana in prometheus server.
+
+Grafana:
+https://grafana.com/docs/grafana/latest/setup-grafana/installation/redhat-rhel-fedora/
+```
+sudo su -
+wget -q -O gpg.key https://rpm.grafana.com/gpg.key
+sudo rpm --import gpg.key
+```
+Create /etc/yum.repos.d/grafana.repo with the following content:
+```
+vi /etc/yum.repos.d/grafana.repo
+```
+```
+[grafana]
+name=grafana
+baseurl=https://rpm.grafana.com
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://rpm.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+```
+```
+sudo dnf instal grafana
+```
+start grafana server :   https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/
+```
+sudo systemctl daemon-reload
+sudo systemctl start grafana-server
+sudo systemctl status grafana-server
+sudo systemctl enable grafana-server.service
+netstat -lntp
+```
+grafana works on port 3000
+open grafana console with url http://<public-ip>:3000
+default id/pwd = admin/admin
+
+Grafana does not has any DB in it. We need to connect it to Prometheus server. Graafana can be connected to any DB (not only prometheus db), so that it can fetch the data and display.
+
+grafana home -> connections -> add new connection -> prometheus -> add new data source -> connection url is http://localhost:9090 ( as prometheus and grafana are in same server) -> save & test.
+
+Its better to install prometheus and grafana in same server.
+
+Create dashboard:
+
+grafana home -> dashboard -> create dash board -> add visualisation -> select prometheus -> code -> (enter the queries in matrics browser field like up etc) -> run queries -> save dashboard
+then it displays the queries in visual form. On the right side we choose visualisation form like timeseries graph, bar chart etc
+
+
 
 
 
