@@ -1,0 +1,13 @@
+groups:
+- name: CPUUtlisation
+  labels:
+    team: myteam
+  rules:
+  - alert: CPUUtlisationAlert
+    expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 0.1
+    for: 1m
+    keep_firing_for: 15m
+    labels:
+      severity: critical
+    annotations:
+      summary: CPUUtlisation is High
