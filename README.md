@@ -152,7 +152,7 @@ sslverify=1
 sslcacert=/etc/pki/tls/certs/ca-bundle.crt
 ```
 ```
-sudo dnf instal grafana
+sudo dnf install grafana
 ```
 start grafana server :   https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/
 ```
@@ -181,7 +181,7 @@ In the scrape config filed, we added node exporter with IP and port, so that nod
 
 dynamic scrapping:
 1. our target ec2's should have node exporter installed.
-2. prometheus server should have permission to describe ec2 instances. (whatevr the tags/availability zone filters we added in scrape config field, prometheus server should have permission to desrcribe that). In IAM policies, we have DescribeInstances policy.
+2. prometheus server should have permission to describe ec2 instances. (whatevr the tags/availability zone filters we added in scrape config field, prometheus server should have permission to desrcribe that). In IAM policies, we have DescribeInstances policy. (1. create a ploicy with instance describe permission. 2. Then create an IAM rule and attach the policy to this rule. 3. Attach this rule to prometheus ec2 server.)
 3. we should filter the target instances based on the tags, region, az etc.
 4. 
 ec2_sd_config
@@ -243,6 +243,17 @@ alert managers opened 2 ports 9093, 9094. we can use 9093 port in prometheus.yam
 
 open alert manager console with http://(public-ip):9093
 
+Metrics:
+Two type of metrics.
+1. counter - It will only increase. (like no. of KMs travelled by car)
+2. gauge - I can increase / decrease (like CPU utilisation)
+
+Import grafana dash boards from outside:
+https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+
+We can import the grafana dashboard from ouside also. We can give the dashboard ID in the grafana dashboard -> import dashboard -> give ID (say 1860 for node exporter full) -> load -> import.
+
+It displays dashboard with all items for our EC2 instances which we need to monitor.
 
 
 
