@@ -59,7 +59,7 @@ systemctl enable prometheus
 netstat -lntp
 ```
 Prometheus runs on port 9090.
-Then open promethues cosnole using url http://<public-ip-of-prometheus-ec2>:9090
+Then open promethues cosnole using url http://(public-ip-of-prometheus-ec2):9090
 
 Prometheus is a time series DB. Its simple but very powerful.
 
@@ -163,7 +163,7 @@ sudo systemctl enable grafana-server.service
 netstat -lntp
 ```
 grafana works on port 3000
-open grafana console with url http://<public-ip>:3000
+open grafana console with url http://(public-ip):3000
 default id/pwd = admin/admin
 
 Grafana does not has any DB in it. We need to connect it to Prometheus server. Graafana can be connected to any DB (not only prometheus db), so that it can fetch the data and display.
@@ -241,7 +241,7 @@ systemctl enable alertmanager
 ```
 alert managers opened 2 ports 9093, 9094. we can use 9093 port in prometheus.yaml config file.
 
-open alert manager console with http://<public-ip>:9093
+open alert manager console with http://(public-ip):9093
 
 
 
