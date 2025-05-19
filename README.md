@@ -244,3 +244,5 @@ alert managers opened 2 ports 9093, 9094. we can use 9093 port in prometheus.yam
 open alert manager console with http://<public-ip>:9093
 
 
+
+
