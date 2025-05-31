@@ -269,7 +269,7 @@ ELK is a big thing. To practice this elk, we need t3.medium instance and 50GB st
 
 In monitoring we saw on saturation. Now by using ELK, we can see remaining things like Latency, Errors, Traffic by analysing ELK logs.
 
-
+Filebeat is a popular agent for log shipping to elastic search. We call filebeat as log shipper. 
 
 
 
