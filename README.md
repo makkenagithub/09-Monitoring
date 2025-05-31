@@ -260,3 +260,17 @@ It displays dashboard with all items for our EC2 instances which we need to moni
 Usually a separate will be there for ELK. Its b big think.
 
 Elastic search is a database for logs. 
+
+Our worker nodes will be having application logs or system logs etc. Certain agents will run in worker nodes as sidecars. Examples for these agents are Filebeat, fluentd etc. Filebeat is a popular sidecar agent. These sidecars collect the logs from the path given to them like eg: /var/log/nginx/access.log 
+
+Whenevr there are new entries in the log path, sidecars will take them and push to elastic search. Inbetween agents and elastic search we have a component called logstash. Kibana is to show the logs from elastic search in UI to users. Kibana acts as UI. 
+
+ELK is a big thing. To practice this elk, we need t3.medium instance and 50GB storage while creating ec2. 
+
+In monitoring we saw on saturation. Now by using ELK, we can see remaining things like Latency, Errors, Traffic by analysing ELK logs.
+
+
+
+
+
+
