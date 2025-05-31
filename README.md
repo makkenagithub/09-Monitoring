@@ -256,4 +256,7 @@ We can import the grafana dashboard from ouside also. We can give the dashboard 
 It displays dashboard with all items for our EC2 instances which we need to monitor.
 
 
+### ELK (Elastic search, Logstash and Kibana)
+Usually a separate will be there for ELK. Its b big think.
 
+Elastic search is a database for logs. 
