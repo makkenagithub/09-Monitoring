@@ -66,6 +66,8 @@ A collection agent that can access the logs and continuously push them to Logsta
 
 ### Installation
 
+Take an ec2 of t3.medium with 50GB
+
 1. Install Java
 ```
 yum install java-11-openjdk-devel -y
@@ -106,6 +108,7 @@ network.host: 0.0.0.0
 ```
 discovery.type: single-node
 ```
+We need to enter the above line in discovery section of /etc/elasticsearch/elasticsearch.yml. Because in ELK also there will be lot of nodes and its also like master and node architecture. Here we are using single node, hence we need to enter above line.
 
 4. Restart elasticsearch
 
@@ -142,6 +145,8 @@ curl localhost:9200
 ```
 systemctl enable elasticsearch
 ```
+We can open elastic search with url http://(public-IP-of-ec2):9200 and see it shows above content of sample output. Elastic search does not show its data in visual form, we have to use kibana to visualize data of elastic search.
+
 #### Kibana
 
 1. Install kibana
@@ -168,6 +173,9 @@ systemctl restart kibana
 ```
 systemctl enable kibana
 ```
+open kibana url with http://(public-ip):5601
+
+It shows elastic search in the form of UI.
 
 #### Logstash
 
