@@ -66,7 +66,7 @@ A collection agent that can access the logs and continuously push them to Logsta
 
 ### Installation
 
-Take an ec2 of t3.medium with 50GB
+Take an ec2 of t3.medium with 50GB say name as elk ec2
 
 1. Install Java
 ```
@@ -149,7 +149,7 @@ We can open elastic search with url http://(public-IP-of-ec2):9200 and see it sh
 
 #### Kibana
 
-1. Install kibana
+1. Install kibana in elk ec2
 
 ```
 yum install kibana -y
@@ -178,8 +178,9 @@ open kibana url with http://(public-ip):5601
 It shows elastic search in the form of UI.
 
 #### Logstash
+Generally in realtime elastic search , kibane will  be in same ec2. But logstash will be in separate ec2. Here we are doing in same elk ec2.
 
-1. Install logstash
+1. Install logstash in elk ec2.
 
 Add the logstash repo
 ```
@@ -237,6 +238,8 @@ systemctl enable logstash
 
 #### Filebeat
 
+filebeat needs to be installed in ec2 servers / worker nodes, from where we want to ship the logs to elastic search. Create an ec2 and install frontend nginx.
+
 1. Add the repo
 
 ```
@@ -268,7 +271,9 @@ vim /etc/filebeat/filebeat.yml
 
 - Set `enabled: true` under filebeat.inputs
 - Under paths: modify the log path to `/var/log/nginx/access.log`
-- Specify the elasticsearch IP address for the host variable under output.elasticsearch section
+- Specify the elasticsearch IP address (private / public IP) for the hosts variable under output.elasticsearch section If we specify this filebeat sends data to elastic search. We need to uncomment the output.elasticsearch and hosts
+
+- If we wnat to send data to logstash (in real time filebeat sends data to logstash) comment the hosts in "output.elasticsearch section". Then uncomment the "output.logstash" and hosts field enter logstash installed ec2 IP address (private / public IP). Port is 5044 for filebeat
 
 4. Start filebeat service
 
@@ -277,6 +282,23 @@ systemctl start filebeat
 ```
 
 - We can check whether the connection is established or not using `tail -f /var/log/messages` file
+
+Now try to add some data in frontend ec2 url travel 500 etc, 
+
+Then goto elastic search with url http://(public-IP-of-ec2):9200 and then home -> stack management -> index management 
+
+and observe some data is coming from frontend ec2 to elastic search url. But its not possible to see data here. We need to create index patterns to see the data. 
+Usually lot of data comes here, to filterout which data we want to see, we create index patterns. Like give filebeat* in name and @timestamp in time stamp field.
+
+Then home -> discover , here we can see logs data. So developers come here and see the logs and analyse their issues.
+
+
+We have data in structued , unstructured and semi-structured data. In DBs if the data is having rows, columns tables etc, its structured data.
+If we some data in a notepad file with some randoam data, its unstructured. And in nginx log file /var/log/nginx/access.log file , the data looks like semi structured. The goal in data science, data processing is to make the unstructured and semistructured data to structured data. 
+
+So here in logs data is like semi structured format. To make it structured format, we need a compoent called logstash. That is the pupose of log stash.
+
+
 
 #### Grok filter
 
@@ -290,12 +312,14 @@ systemctl start filebeat
 49.37.170.160 [15/Dec/2023:00:51:38 +0000] GET /api/catalogue/categories HTTP/1.1 404 571 "http://54.242.20.135/" 0.000
 ```
 
-**Sample Grok**
+**Sample Grok pattern**
 ```
 %{IP:client_ip} \[%{HTTPDATE:timestamp}\] %{WORD:http_method} %{URIPATH:request_path} %{NOTSPACE:http_version} %{NUMBER:status:int} %{NUMBER:response_size:int} \"%{URI:referrer}\" %{NUMBER:response_time:float}
 ```
 
-**Sample Logstash**
+**Sample Logstash filter**
+
+vim /etc/logstash/conf.d/logstash.conf
 ```
 input {
   beats {
